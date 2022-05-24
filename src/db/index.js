@@ -6,6 +6,7 @@ const sequelize = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
   host: PGHOST,
   port: PGPORT,
   dialect: "postgres",
+  logging: false,
 })
 
 export const cartDB = async () => {
