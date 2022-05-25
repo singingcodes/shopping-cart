@@ -1,14 +1,39 @@
 import express from "express"
 import models from "../../db/models/index.js"
 
-const { Product, Review } = models
+const { Product, Review, User, ProductCategory } = models
 
 const productRouter = express.Router()
 
 // GET /api/products
+
 productRouter.get("/", async (req, res, next) => {
   try {
-    const products = await Product.findAll({ include: Review })
+    const products = await Product.findAll({
+      where: req.query.search && {
+        [Op.or]: [
+          {
+            name: {
+              [Op.iLike]: `%${req.query.search}%`,
+            },
+          },
+          {
+            description: {
+              [Op.iLike]: `%${req.query.search}%`,
+            },
+          },
+        ],
+      },
+      include: [
+        User,
+        {
+          model: Review,
+          include: { model: User, attributes: ["name", "lastName"] },
+        },
+        { model: Category, through: { attributes: [] } },
+      ],
+      order: [["price", "ASC"]],
+    })
 
     res.send(products)
   } catch (err) {
@@ -32,7 +57,15 @@ productRouter.get("/:id", async (req, res, next) => {
 // POST /api/products
 productRouter.post("/", async (req, res, next) => {
   try {
-    const product = await Product.create(req.body)
+    const { name, description, price, imageUrl, categories } = req.body
+    const product = await Product.create({ name, description, price, imageUrl })
+    res.send(product)
+    const productId = product.id
+    const data = []
+    categories.forEach((categoryId) => {
+      data.push({ productId, categoryId })
+    })
+    await ProductCategory.bulkCreate(data)
     res.send(product)
   } catch (err) {
     next(err)

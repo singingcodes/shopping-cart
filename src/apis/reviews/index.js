@@ -30,9 +30,10 @@ reviewRouter.get("/:id", async (req, res, next) => {
 })
 
 // POST /api/reviews
-reviewRouter.post("/", async (req, res, next) => {
+reviewRouter.post("/:userId", async (req, res, next) => {
   try {
-    const review = await Review.create(req.body)
+    const { userId, productId, text } = req.body
+    const review = await Review.create({ userId, productId, text })
     res.send(review)
   } catch (err) {
     next(err)
