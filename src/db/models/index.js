@@ -10,8 +10,12 @@ Product.belongsToMany(Category, {
 Category.belongsToMany(Product, {
   through: { model: ProductCategory, unique: false },
 })
-// Product.hasMany(Review)
-// Review.belongsTo(Product)
+Product.hasMany(Review)
+Review.belongsTo(Product)
+
+Product.belongsTo(User)
+User.hasMany(Product)
+
 Review.belongsTo(User)
 User.hasMany(Review)
 

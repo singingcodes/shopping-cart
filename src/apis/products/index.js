@@ -1,7 +1,7 @@
 import express from "express"
 import models from "../../db/models/index.js"
 
-const { Product, Review, User, ProductCategory } = models
+const { Product, Review, User, ProductCategory, Category } = models
 
 const productRouter = express.Router()
 
@@ -25,12 +25,9 @@ productRouter.get("/", async (req, res, next) => {
         ],
       },
       include: [
-        User,
-        {
-          model: Review,
-          include: { model: User, attributes: ["name", "lastName"] },
-        },
-        { model: Category, through: { attributes: [] } },
+        { model: Review, attributes: ["text"] },
+
+        { model: Category, through: { attributes: [] }, Review },
       ],
       order: [["price", "ASC"]],
     })
@@ -57,8 +54,8 @@ productRouter.get("/:id", async (req, res, next) => {
 // POST /api/products
 productRouter.post("/", async (req, res, next) => {
   try {
-    const { name, description, price, imageUrl, categories } = req.body
-    const product = await Product.create({ name, description, price, imageUrl })
+    const { name, description, price, image, categories } = req.body
+    const product = await Product.create({ name, description, price, image })
     res.send(product)
     const productId = product.id
     const data = []
@@ -66,7 +63,6 @@ productRouter.post("/", async (req, res, next) => {
       data.push({ productId, categoryId })
     })
     await ProductCategory.bulkCreate(data)
-    res.send(product)
   } catch (err) {
     next(err)
   }

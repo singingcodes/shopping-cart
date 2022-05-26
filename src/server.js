@@ -36,5 +36,5 @@ server.listen(port, async () => {
   console.table(listEndPoints(server))
   console.log(`Server is running on port ${port}`)
   await cartDB()
-  await sequelize.sync({ force: true })
+  await sequelize.sync()
 })

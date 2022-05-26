@@ -11,7 +11,7 @@ const ProductCategory = sequelize.define(
     },
   },
   {
-    timestamp: false,
+    timestamps: false,
   }
 )
 export default ProductCategory

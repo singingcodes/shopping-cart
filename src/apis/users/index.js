@@ -9,8 +9,7 @@ const userRouter = express.Router()
 userRouter.get("/", async (req, res, next) => {
   try {
     const users = await User.findAll({
-      include: Review,
-      attributes: ["text", "username"],
+      include: { model: Review, attributes: ["text"] },
     })
     res.send(users)
   } catch (err) {

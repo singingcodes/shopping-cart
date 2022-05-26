@@ -15,7 +15,7 @@ const Category = sequelize.define(
     },
   },
   {
-    timestamp: false,
+    timestamps: false,
   }
 )
 export default Category
