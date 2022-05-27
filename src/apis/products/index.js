@@ -1,7 +1,7 @@
 import express from "express"
 import models from "../../db/models/index.js"
 
-const { Product, Review, User, ProductCategory, Category } = models
+const { Product, Review, User, ProductCategory, Category, Like } = models
 
 const productRouter = express.Router()
 
@@ -25,9 +25,17 @@ productRouter.get("/", async (req, res, next) => {
         ],
       },
       include: [
+        User,
         { model: Review, attributes: ["text"] },
 
-        { model: Category, through: { attributes: [] }, Review },
+        { model: Category, through: { attributes: [] } },
+
+        //include the likes,
+        //but only the userId and the productId
+        //so that we can use the userId to find the user
+        //and the productId to find the product
+        //and then we can use the userId and the productId
+        { model: Like, attributes: ["isLike"] },
       ],
       order: [["price", "ASC"]],
     })
@@ -56,13 +64,14 @@ productRouter.post("/", async (req, res, next) => {
   try {
     const { name, description, price, image, categories } = req.body
     const product = await Product.create({ name, description, price, image })
-    res.send(product)
+
     const productId = product.id
     const data = []
     categories.forEach((categoryId) => {
       data.push({ productId, categoryId })
     })
     await ProductCategory.bulkCreate(data)
+    res.send(product)
   } catch (err) {
     next(err)
   }
@@ -86,6 +95,31 @@ productRouter.delete("/:id", async (req, res, next) => {
     })
     res.send({ product })
   } catch (error) {}
+})
+
+//GET /api/products/like
+//add a like to a product
+productRouter.post("/like", async (req, res, next) => {
+  try {
+    const { userId, productId, isLike } = req.body
+    const like = await Like.create({ userId, productId, isLike })
+    res.send(like)
+  } catch (err) {
+    next(err)
+  }
+})
+
+//DELETE /api/products/:id/Unlike
+//remove a like from a product
+productRouter.delete("/:id/unlike", async (req, res, next) => {
+  try {
+    const like = await Like.destroy({
+      where: { id: req.params.id },
+    })
+    res.send({ like })
+  } catch (err) {
+    next(err)
+  }
 })
 
 export default productRouter

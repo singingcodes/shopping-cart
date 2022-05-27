@@ -7,6 +7,7 @@ import productRouter from "./apis/products/index.js"
 import reviewRouter from "./apis/reviews/index.js"
 import categoryRouter from "./apis/categories/index.js"
 import userRouter from "./apis/users/index.js"
+import cartRouter from "./apis/carts/index.js"
 import sequelize from "./db/index.js"
 
 import {
@@ -27,6 +28,7 @@ server.use("/product", productRouter)
 server.use("/review", reviewRouter)
 server.use("/category", categoryRouter)
 server.use("/user", userRouter)
+server.use("/cart", cartRouter)
 // error handlers
 server.use(badRequestError)
 server.use(notFoundError)
