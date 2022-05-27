@@ -25,9 +25,10 @@ productRouter.get("/", async (req, res, next) => {
         ],
       },
       include: [
+        { model: User, as: "user" },
         { model: Review, attributes: ["text"] },
 
-        { model: Category, through: { attributes: ["name"] } },
+        { model: Category, through: { attributes: [] } },
 
         //include the likes,
         //but only the userId and the productId
@@ -61,14 +62,8 @@ productRouter.get("/:id", async (req, res, next) => {
 // POST /api/products
 productRouter.post("/", async (req, res, next) => {
   try {
-    const { name, description, price, image, userId, categories } = req.body
-    const product = await Product.create({
-      name,
-      description,
-      price,
-      image,
-      userId,
-    })
+    const { name, description, price, image, categories } = req.body
+    const product = await Product.create({ name, description, price, image })
 
     const productId = product.id
     const data = []
