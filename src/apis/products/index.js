@@ -25,7 +25,6 @@ productRouter.get("/", async (req, res, next) => {
         ],
       },
       include: [
-        { model: User, as: "user" },
         { model: Review, attributes: ["text"] },
 
         { model: Category, through: { attributes: ["name"] } },
